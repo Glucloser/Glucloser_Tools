@@ -21,12 +21,21 @@ run do
     @driver.find_element(:id, 'j_username').send_keys ENV['carelink_user']
     @driver.find_element(:id, 'j_password').send_keys ENV['carelink_pw']
     @driver.find_element(:id, 'loginButton').click
+
     begin
     Selenium::WebDriver::Wait.new(:timeout => 10).until { @driver.find_element(:id, 'toReports')}
     rescue Selenium::WebDriver::Error::TimeOutError
       @driver.save_screenshot('error0.png')
     end
     @driver.find_element(:id, 'toReports').click
+
+    begin
+    Selenium::WebDriver::Wait.new(:timeout => 10).until { @driver.find_element(:id, 'originalReportsLink')}
+    rescue Selenium::WebDriver::Error::TimeOutError
+      @driver.save_screenshot('error2.png')
+    end
+    @driver.find_element(:id, 'originalReportsLink').click
+
     begin
     Selenium::WebDriver::Wait.new(:timeout => 10).until { @driver.find_element(:link, 'Data Export (CSV)')}
     rescue Selenium::WebDriver::Error::TimeOutError

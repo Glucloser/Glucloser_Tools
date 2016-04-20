@@ -6,6 +6,7 @@ import json
 import re
 import requests
 import sys
+import os
 
 def create_INT(data):
     return int(data)
@@ -61,8 +62,8 @@ def hilite(string, status, bold):
 API_KEY_HEADER = "X-Cairo-API-Key"
 APP_ID_HEADER = "X-Cairo-Application-ID"
 
-API_KEY = ""
-APP_ID = ""
+API_KEY = os.environ['cairo_api_key']
+APP_ID = os.environ['cairo_app_id']
 
 URL = "https://cairo.glucloser.com:443/pump/data/upload"
 

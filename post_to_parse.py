@@ -8,6 +8,63 @@ import requests
 import sys
 import os
 
+
+
+def login():
+    # Login
+    # POST https://carelink.minimed.com/patient/j_security_check
+
+    try:
+        response = requests.post(
+            url="https://carelink.minimed.com/patient/j_security_check",
+            headers={
+                "Cookie": "dtCookie=5E376F47FB39E8CC403E1B2813605949|X2RlZmF1bHR8MQ; JSESSIONID=Sh1vXcNT1lqnmLyFpGj15GJc7qJVBXgx9bdNnvWc2lVHNxSc5hRF!536813853!-437707529; _WL_AUTHCOOKIE_JSESSIONID=a6OFQBYrTKx7XXmHaa.M",
+                "Content-Type": "application/x-www-form-urlencoded; charset=utf-8",
+            },
+            data={
+                "j_password": "charlene",
+                "j_username": "nil088",
+                "j_character_encoding": "UTF-8",
+            },
+        )
+        print('Response HTTP Status Code: {status_code}'.format(
+            status_code=response.status_code))
+        print('Response HTTP Response Body: {content}'.format(
+            content=response.content))
+    except requests.exceptions.RequestException:
+        print('HTTP Request failed')
+
+def fetchCSV():
+    # CSV Export
+    # POST https://carelink.minimed.com/patient/main/selectCSV.do
+
+    try:
+        response = requests.post(
+            url="https://carelink.minimed.com/patient/main/selectCSV.do",
+            params={
+                "t": "11",
+            },
+            headers={
+                "Cookie": "dtCookie=5E376F47FB39E8CC403E1B2813605949|X2RlZmF1bHR8MQ; JSESSIONID=Sh1vXcNT1lqnmLyFpGj15GJc7qJVBXgx9bdNnvWc2lVHNxSc5hRF!536813853!-437707529; _WL_AUTHCOOKIE_JSESSIONID=a6OFQBYrTKx7XXmHaa.M",
+                "Content-Type": "application/x-www-form-urlencoded; charset=utf-8",
+            },
+            data={
+                "datePicker2": "07/28/2016",
+                "listSeparator": ",",
+                "datePicker1": "07/29/2016",
+                "report": "11",
+                "customerID": "553090",
+            },
+        )
+        print('Response HTTP Status Code: {status_code}'.format(
+            status_code=response.status_code))
+        print('Response HTTP Response Body: {content}'.format(
+            content=response.content))
+        return response.content
+    except requests.exceptions.RequestException:
+        print('HTTP Request failed')
+
+
 def create_INT(data):
     return int(data)
 
@@ -86,15 +143,10 @@ skip_info_rows_count = 11
 # TODO(nl) EST/EDT
 tz_delta = timedelta(hours=4)
 
-csv_file = sys.argv[1]
-
-if not csv_file:
-    print "Takes a path to the csv to upload", "No data uploaded"
-    exit(-1)
-
 isTTY = sys.stdout.isatty()
 
-csv_reader = csv.reader(open(csv_file, 'rb'))
+login()
+csv_reader = csv.reader(fetchCSV())
 
 while skip_info_rows_count:
     csv_reader.next()

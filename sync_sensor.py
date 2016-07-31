@@ -37,6 +37,7 @@ API_KEY = os.environ['cairo_api_key']
 APP_ID = os.environ['cairo_app_id']
 
 URL = "https://cairo.glucloser.com:4443/pump/data/upload"
+HEADERS = {API_KEY_HEADER: API_KEY, APP_ID_HEADER: APP_ID, "Content-Type": "application/json"}
 
 isTTY = sys.stdout.isatty()
 

@@ -44,7 +44,7 @@ isTTY = sys.stdout.isatty()
 
 for sg in sensor_data.sensorReadings:
     payload = {}
-    payload["reading"] = sg.reading
+    payload["reading"] = int(sg.reading)
     payload["dateTimeString"] = sg.dateTimeString
 
     if not payload:

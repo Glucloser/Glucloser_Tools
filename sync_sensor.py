@@ -17,7 +17,7 @@ def hilite(string, status, bold):
 
 session = Carelink.startSession()
 
-CARELINK_USER = os.environ['carelink_username']
+CARELINK_USER = os.environ['carelink_user']
 CARELINK_PW = os.environ['carelink_pw']
 
 if not Carelink.login(session, CARELINK_USER, CARELINK_PW):

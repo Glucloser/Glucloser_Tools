@@ -25,7 +25,7 @@ def _create_DATEOBJ(data, tmz_delta, format):
 
 def dateToStr(date):
     # Since datetime doesn't understand parsing timezones
-    return date.strftime("%Y-%m-%dT%H:%M:%S")
+    return date.strftime("%Y-%m-%dT%H:%M:%SZ")
 
 def create_DATE(data, tmz_delta):
     date = _create_DATEOBJ(data, tmz_delta, "%m/%d/%y")

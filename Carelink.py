@@ -33,19 +33,20 @@ def csv_export(session):
                 "customerID": "553090",
             },
         )
-        sys.stderr.write('Response HTTP Status Code: {status_code}\n'.format(
-            status_code=response.status_code))
-        sys.stderr.write('Response HTTP Response Body: {content}\n'.format(
-            content=response.content))
+        #sys.stderr.write('Response HTTP Status Code: {status_code}\n'.format(
+        #    status_code=response.status_code))
+        #sys.stderr.write('Response HTTP Response Body: {content}\n'.format(
+         #   content=response.content))
     except requests.exceptions.RequestException:
-        sys.stderr.write('HTTP Request failed\n')
+        #sys.stderr.write('HTTP Request failed\n')
+        pass
 
 
 def sensor_24_hours(session):
     # Sensor Last 24 Hours
     # GET https://carelink.minimed.com/patient/connect/ConnectViewerServlet
 
-    sys.stderr.write("Fetching 24 hour sensor data\n")
+    #sys.stderr.write("Fetching 24 hour sensor data\n")
 
     try:
         response = session.get(
@@ -59,23 +60,23 @@ def sensor_24_hours(session):
                 "User-Agent": user_agent,
             },
         )
-        sys.stderr.write('Response HTTP Status Code: {status_code}\n'.format(
-            status_code=response.status_code))
+        #sys.stderr.write('Response HTTP Status Code: {status_code}\n'.format(
+          #  status_code=response.status_code))
         # sys.stderr.write('Response HTTP Response Body: {content}'.format(
             # content=response.content))
         return sensor_data_from_json(response.json())
     except ValueError:
-        sys.stderr.write("JSON decoding failed\n")
+        #sys.stderr.write("JSON decoding failed\n")
         return None
     except requests.exceptions.RequestException:
-        sys.stderr.write('HTTP Request failed\n')
+        #sys.stderr.write('HTTP Request failed\n')
         return None
 
 def login(session, username, password):
     # Login
     # POST https://carelink.minimed.com/patient/j_security_check
 
-    sys.stderr.write("Logging In\n")
+    #sys.stderr.write("Logging In\n")
     try:
         response = session.post(
             url="https://carelink.minimed.com/patient/j_security_check",
@@ -89,13 +90,13 @@ def login(session, username, password):
                 "j_character_encoding": "UTF-8",
             },
         )
-        sys.stderr.write('Response HTTP Status Code: {status_code}\n'.format(
-            status_code=response.status_code))
+        #sys.stderr.write('Response HTTP Status Code: {status_code}\n'.format(
+        #    status_code=response.status_code))
         # sys.stderr.write('Response HTTP Response Body: {content}'.format(
             # content=response.content))
         return True
     except requests.exceptions.RequestException:
-        sys.stderr.write('HTTP Request failed\n')
+        #sys.stderr.write('HTTP Request failed\n')
         return False
 
 def sensor_data_from_json(json):

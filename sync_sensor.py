@@ -25,7 +25,7 @@ def _create_DATEOBJ(data, tmz_delta, format):
 
 def dateToStr(date):
     # Since datetime doesn't understand parsing timezones
-    return date.strftime("%Y-%m-%dT%H:%M:%S") + "-04:00"
+    return date.strftime("%Y-%m-%dT%H:%M:%S")
 
 def create_DATE(data, tmz_delta):
     date = _create_DATEOBJ(data, tmz_delta, "%m/%d/%y")
@@ -69,14 +69,10 @@ HEADERS = {API_KEY_HEADER: API_KEY, APP_ID_HEADER: APP_ID, "Content-Type": "appl
 
 isTTY = sys.stdout.isatty()
 
-# Don't have any way to get the GMT offset of the device
-# TODO(nl) EST/EDT
-tz_delta = timedelta(hours=4)
-
 for sg in sensor_data.sensorReadings:
     payload = {}
     payload["reading"] = int(sg.reading)
-    payload["dateTimeString"] = create_TIMESTAMP(sg.dateTimeString, tz_delta)
+    payload["dateTimeString"] = create_TIMESTAMP(sg.dateTimeString, None)
 
     if not payload:
         print "Empty payload, skipping"

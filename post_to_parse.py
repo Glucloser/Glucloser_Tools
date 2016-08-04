@@ -37,7 +37,7 @@ def create_TIME(data, tmz_delta):
     return hour + min + sec
 
 def create_TIMESTAMP(data, tmz_delta):
-    date = _create_DATEOBJ(data, tmz_delta, "%m/%d/%y %H:%M:%S")
+    date = _create_DATEOBJ(data, tmz_delta, "%b %d, %Y %H:%M:%S")
     return dateToStr(date)
 
 def create_STRING(data):

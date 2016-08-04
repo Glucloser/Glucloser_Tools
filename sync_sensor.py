@@ -76,7 +76,7 @@ tz_delta = timedelta(hours=4)
 for sg in sensor_data.sensorReadings:
     payload = {}
     payload["reading"] = int(sg.reading)
-    payload["dateTimeString"] = dateToStr(create_TIMESTAMP(sg.dateTimeString, tz_delta))
+    payload["dateTimeString"] = create_TIMESTAMP(sg.dateTimeString, tz_delta)
 
     if not payload:
         print "Empty payload, skipping"

@@ -109,7 +109,8 @@ def sensor_data_from_json(json):
         sd.lastSensorReading = SensorReading(lastSG["sg"], lastSG["datetime"])
 
     insulin = json["activeInsulin"]
-    sd.activeInsulin = Insulin(insulin["amount"], insulin["datetime"])
+    if "amount" in insulin and "datetime" in insulin:
+        sd.activeInsulin = Insulin(insulin["amount"], insulin["datetime"])
 
     for sg in json["sgs"]:
         if "sg" in sg and "datetime" in sg:

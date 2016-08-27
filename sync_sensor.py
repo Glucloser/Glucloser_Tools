@@ -71,8 +71,8 @@ isTTY = sys.stdout.isatty()
 
 for sg in sensor_data.sensorReadings:
     payload = {}
-    payload["reading"] = int(sg.reading)
-    payload["dateTimeString"] = create_TIMESTAMP(sg.dateTimeString, None)
+    payload["readingValue"] = int(sg.reading)
+    payload["recordedDate"] = create_TIMESTAMP(sg.dateTimeString, None)
 
     if not payload:
         print "Empty payload, skipping"

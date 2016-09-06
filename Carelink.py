@@ -4,12 +4,77 @@
 import time
 import sys
 import requests
+from lxml import html
+from urlparse import urlparse
 
 def startSession():
     return requests.session()
 
 
 user_agent = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_2) AppleWebKit/601.3.9 (KHTML, like Gecko)     Version/9.0.2 Safari/601.3.9"
+
+def download(session, url):
+    try:
+        response = session.get(
+            url=url,
+            headers={
+            },
+        )
+        return response.content
+        # print('Response HTTP Status Code: {status_code}'.format(
+            # status_code=response.status_code))
+        # print('Response HTTP Response Body: {content}'.format(
+            # content=response.content))
+    except requests.exceptions.RequestException:
+        # print('HTTP Request failed')
+        return None
+
+
+def request_all_reports(session):
+    # All Reports
+    # POST https://carelink.minimed.com/patient/main/requestProReport.do
+
+    try:
+        response = session.post(
+            url="https://carelink.minimed.com/patient/main/requestProReport.do",
+            headers={
+                "Content-Type": "application/x-www-form-urlencoded; charset=utf-8",
+            },
+            data={
+                "masterDuration": "2",
+                "startDateString": "2016-08-23T17:07:37-04:00",
+                "endDateString": "2016-09-05T17:07:37-04:00",
+                "clientTimeString": "09/05/2016 5:08:20 PM",
+                "selected[0]": "on",
+                "selected[3]": "on",
+                "customerID": "553090",
+                "dailyDetails": "1,2,3",
+                "selected[1]": "on",
+                "selected[4]": "on",
+                "dailySelected": "2016-08-23T00:00:00-04:00,2016-08-24T00:00:00-04:00",
+                "selected[2]": "on",
+                "selected[5]": "on",
+            },
+        )
+        page = html.fromstring(response.content)
+        reportURL = page.xpath('//*[@id="content"]/form/@action')
+        if len(reportURL) == 0:
+            return None
+        
+        reportURL = reportURL[0]
+
+        pageURL = urlparse(response.url)
+        return "{}://{}{}".format(pageURL.scheme, pageURL.netloc, reportURL)
+        # print('Response HTTP Status Code: {status_code}'.format(
+            # status_code=response.status_code))
+        # print('Response HTTP Response Body: {content}'.format(
+            # content=response.content))
+    except requests.exceptions.RequestException:
+        # print('HTTP Request failed')
+        return None
+
+
+
 
 def csv_export(session):
     # CSV Export

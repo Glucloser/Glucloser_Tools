@@ -3,4 +3,7 @@ SPATH=$(readlink -f "$0")
 DIR=$(dirname "$SPATH")
 
 source "$DIR/.keys.sh"
-python $DIR/download_reports.py | xargs -i{} 'echo "" | mutt -s "Daily Report" n.lefler@gmail.com -a {}.pdf'
+reportFile=$(python $DIR/download_reports.py)
+reportFilePDF="$reportFile.pdf"
+mv $reportFile $reportFilePDF
+echo "" | mutt -s "Daily Report" n.lefler@gmail.com -a $reportFilePDF

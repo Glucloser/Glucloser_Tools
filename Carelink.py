@@ -6,6 +6,7 @@ import sys
 import requests
 from lxml import html
 from urlparse import urlparse
+from datetime import datetime, timedelta
 
 def startSession():
     return requests.session()
@@ -34,27 +35,47 @@ def request_all_reports(session):
     # All Reports
     # POST https://carelink.minimed.com/patient/main/requestProReport.do
 
-    try:
-        response = session.post(
-            url="https://carelink.minimed.com/patient/main/requestProReport.do",
-            headers={
-                "Content-Type": "application/x-www-form-urlencoded; charset=utf-8",
-            },
-            data={
+    # TODO(nl): time zone
+    startDate = datetime.now().replace(hour=0,minute=0,second=0,microsecond=0)
+    delta = timedelta(-7)
+    startDate = startDate + delta
+    startDateString = startDate.strftime("%Y-%m-%dT%H:%M:%S-04:00")
+
+    endDate = datetime.now().replace(hour=0,minute=0,second=0,microsecond=0)
+    endDateString =  endDate.strftime("%Y-%m-%dT%H:%M:%S-04:00")
+
+    clientTime = datetime.now()
+    clientTimeString = clientTime.strftime("%m/%d/%y %I:M:%S %p")
+
+    daysSelected = "" 
+    d = datetime.now().replace(hour=0,minute=0,second=0,microsecond=0)
+    for i in range(1, 7):
+        delta = timedelta(-1*i)
+        daysSelected += (d + delta).strftime("%Y-%m-%dT%H:%M:%S-04:00")
+
+    data = {
                 "masterDuration": "2",
-                "startDateString": "2016-08-23T17:07:37-04:00",
-                "endDateString": "2016-09-05T17:07:37-04:00",
-                "clientTimeString": "09/05/2016 5:08:20 PM",
+                "startDateString": startDateString,
+                "endDateString": endDateString,
+                "clientTimeString": clientTimeString,
                 "selected[0]": "on",
                 "selected[3]": "on",
                 "customerID": "553090",
                 "dailyDetails": "1,2,3",
                 "selected[1]": "on",
                 "selected[4]": "on",
-                "dailySelected": "2016-08-23T00:00:00-04:00,2016-08-24T00:00:00-04:00",
+                "dailySelected": endDateString,
                 "selected[2]": "on",
                 "selected[5]": "on",
+            }
+            
+    try:
+        response = session.post(
+            url="https://carelink.minimed.com/patient/main/requestProReport.do",
+            headers={
+                "Content-Type": "application/x-www-form-urlencoded; charset=utf-8",
             },
+            data=data,
         )
         page = html.fromstring(response.content)
         reportURL = page.xpath('//*[@id="content"]/form/@action')

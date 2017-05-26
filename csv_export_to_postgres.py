@@ -81,7 +81,7 @@ def work():
 
 
     sess = Carelink.startSession()
-    Carelink.login(sess, "nil088", "childrensdc")
+    Carelink.login(sess, "", "")
 
     strf_format = "%m/%d/%Y"
     export_start_date = (date.today() - timedelta(days=1)).strftime(strf_format)

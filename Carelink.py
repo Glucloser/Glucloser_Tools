@@ -97,7 +97,11 @@ def request_all_reports(session):
 
 
 
-def csv_export(session):
+def csv_export(session, start_date, end_date):
+    """
+    Fetches a csv export report for the date range. Date params should be strings
+    of the format mm/dd/yyy.
+    """
     # CSV Export
     # POST https://carelink.minimed.com/patient/main/selectCSV.do
 
@@ -112,9 +116,9 @@ def csv_export(session):
                 "User-Agent": user_agent,
             },
             data={
-                "datePicker2": "07/28/2016",
+                "datePicker2": start_date,
                 "listSeparator": ",",
-                "datePicker1": "07/29/2016",
+                "datePicker1": end_date,
                 "report": "11",
                 "customerID": "553090",
             },

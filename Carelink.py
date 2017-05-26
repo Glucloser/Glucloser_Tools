@@ -119,13 +119,13 @@ def csv_export(session):
                 "customerID": "553090",
             },
         )
-        #sys.stderr.write('Response HTTP Status Code: {status_code}\n'.format(
-        #    status_code=response.status_code))
         #sys.stderr.write('Response HTTP Response Body: {content}\n'.format(
          #   content=response.content))
+        return response.content
     except requests.exceptions.RequestException:
-        #sys.stderr.write('HTTP Request failed\n')
-        pass
+        sys.stderr.write('HTTP Request failed\n')
+        sys.stderr.write('Response HTTP Status Code: {status_code}\n'.format(
+            status_code=response.status_code))
 
 
 def sensor_24_hours(session):

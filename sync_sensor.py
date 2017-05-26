@@ -57,6 +57,7 @@ if sensor_data == None:
     sys.stderr.write("No sensor data")
     exit(1)
 
+exit(1)
 
 API_KEY_HEADER = "X-Cairo-API-Key"
 APP_ID_HEADER = "X-Cairo-Application-ID"

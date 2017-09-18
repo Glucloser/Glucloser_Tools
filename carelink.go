@@ -2,7 +2,11 @@ package main
 
 import (
 	"crypto/tls"
+	"encoding/csv"
+	"encoding/json"
+	"errors"
 	"fmt"
+	"github.com/Glucloser/models"
 	"golang.org/x/net/publicsuffix"
 	"io"
 	"log"
@@ -20,6 +24,84 @@ const (
 	csvURL    = "https://carelink.minimed.com/patient/main/selectCSV.do?t=11"
 	cgmURL    = "https://carelink.minimed.com/patient/connect/ConnectViewerServlet"
 )
+
+func ParseCSVExport(reader io.ReadCloser) (<-chan models.AuditItem, error) {
+	csvReader := csv.NewReader(reader)
+	csvReader.FieldsPerRecord = -1
+
+	var headers []string
+	for {
+		line, err := csvReader.Read()
+		if err != nil {
+			return nil, err
+		}
+		if len(line) == 0 {
+			continue
+		}
+		if line[0] == "Index" {
+			headers = line
+			break
+		}
+	}
+
+	if len(headers) == 0 {
+		return nil, errors.New("No headers in CSV")
+	}
+
+	out := make(chan models.AuditItem)
+	go func(out chan models.AuditItem, csvReader *csv.Reader, closer io.Closer) {
+		for {
+			line, err := csvReader.Read()
+			if err != nil {
+				log.Printf("CSV read error %v", err)
+				close(out)
+				closer.Close()
+				break
+			}
+			if len(line) == 0 {
+				continue
+			}
+			item := &models.AuditItem{}
+			for i := 0; i < len(headers) && i < len(line); i++ {
+				item.SetRaw(headers[i], line[i])
+			}
+			out <- *item
+		}
+	}(out, csvReader, reader)
+
+	return out, nil
+
+}
+
+func ParseCGMExport(reader io.ReadCloser) ([]models.Sugar, error) {
+	decoder := json.NewDecoder(reader)
+	var sgs struct {
+		Sgs []struct {
+			Value float64 `json:"sg"`
+			Time  string  `json:"datetime"`
+		} `json:"sgs"`
+	}
+	err := decoder.Decode(&sgs)
+	if err != nil {
+		return []models.Sugar{}, err
+	}
+
+	sugars := make([]models.Sugar, len(sgs.Sgs))
+	for i, sg := range sgs.Sgs {
+		sugar := models.Sugar{}
+		occurredAt, err := time.Parse("Jan 2, 2006 15:04:05", sg.Time)
+		if err != nil {
+			continue
+		}
+		sugar.OccurredAt = occurredAt
+		sugar.Value = int(sg.Value)
+		sugars[i] = sugar
+	}
+	reader.Close()
+
+	return sugars, nil
+
+}
 
 // CarelinkSession holds state for interacting with Carelink
 type CarelinkSession struct {

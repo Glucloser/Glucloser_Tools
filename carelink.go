@@ -1,7 +1,7 @@
 package main
 
 import (
-	"crypto/tls"
+	_ "crypto/tls"
 	"encoding/csv"
 	"encoding/json"
 	"errors"
@@ -109,23 +109,23 @@ type CarelinkSession struct {
 }
 
 func NewCarelinkSession() (CarelinkSession, error) {
-	defaultTransport := http.DefaultTransport.(*http.Transport)
+	//	defaultTransport := http.DefaultTransport.(*http.Transport)
 
 	// Create new Transport that ignores self-signed SSL
-	tr := &http.Transport{
-		Proxy:                 defaultTransport.Proxy,
-		DialContext:           defaultTransport.DialContext,
-		MaxIdleConns:          defaultTransport.MaxIdleConns,
-		IdleConnTimeout:       defaultTransport.IdleConnTimeout,
-		ExpectContinueTimeout: defaultTransport.ExpectContinueTimeout,
-		TLSHandshakeTimeout:   defaultTransport.TLSHandshakeTimeout,
-		TLSClientConfig:       &tls.Config{InsecureSkipVerify: true},
-	}
+	//tr := &http.Transport{
+	//Proxy:                 defaultTransport.Proxy,
+	//		DialContext:           defaultTransport.DialContext,
+	//		MaxIdleConns:          defaultTransport.MaxIdleConns,
+	//		IdleConnTimeout:       defaultTransport.IdleConnTimeout,
+	//		ExpectContinueTimeout: defaultTransport.ExpectContinueTimeout,
+	//		TLSHandshakeTimeout:   defaultTransport.TLSHandshakeTimeout,
+	//		TLSClientConfig:       &tls.Config{InsecureSkipVerify: true},
+	//	}
 	jar, err := cookiejar.New(&cookiejar.Options{PublicSuffixList: publicsuffix.List})
 	if err != nil {
 		return CarelinkSession{}, err
 	}
-	return CarelinkSession{http.Client{Transport: tr, Jar: jar}}, nil
+	return CarelinkSession{http.Client{Jar: jar}}, nil
 }
 
 func (sess CarelinkSession) Login(username, password string) error {

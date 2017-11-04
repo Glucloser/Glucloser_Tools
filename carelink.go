@@ -38,6 +38,9 @@ func ParseCSVExport(reader io.ReadCloser) (<-chan models.AuditItem, error) {
 		if len(line) == 0 {
 			continue
 		}
+		if line[0] == "Data Range" && len(line) >= 3 {
+			log.Printf("Data Range %s to %s", line[1], line[3])
+		}
 		if line[0] == "Index" {
 			headers = line
 			break

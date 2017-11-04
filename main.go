@@ -24,8 +24,9 @@ func main() {
 }
 
 func processCSVExport(sess CarelinkSession) {
-	today := time.Now().Format("01/02/2006")
-	tomorrow := time.Now().Add(time.Hour * 24).Format("01/02/2006")
+	today := time.Now().Add(-48 * time.Hour).Format("01/02/2006")
+	tomorrow := time.Now().Format("01/02/2006")
+	log.Printf("Fetching audit items from %s to %s", today, tomorrow)
 	reader, err := sess.CSVExport(today, tomorrow)
 	if err != nil {
 		log.Println(err)
@@ -38,9 +39,19 @@ func processCSVExport(sess CarelinkSession) {
 	}
 
 	count := 0
+	db := models.DB().Begin()
 	for item := range auditItems {
-		models.DB().Create(&item)
-		count++
+		var existing models.AuditItem
+		db.Where(models.AuditItem{RawID: item.RawID}).First(&existing)
+		if db.NewRecord(existing) {
+			item.Occurred.OccurredAt = addEasternTZ(item.Occurred.OccurredAt)
+			models.DB().Create(&item)
+			count++
+		}
+	}
+	db.Commit()
+	if db.Error != nil {
+		log.Printf("Audit Items error %v", db.Error)
 	}
 	log.Printf("Inserted %d Audit Items", count)
 
@@ -58,8 +69,36 @@ func processCGMExport(sess CarelinkSession) {
 		log.Println(err)
 		return
 	}
+	db := models.DB().Begin()
+	inserted := 0
 	for _, reading := range cgmReadings {
-		models.DB().Create(&reading)
+		var existing models.Sugar
+		db.Where(&models.Sugar{Occurred: models.Occurred{reading.OccurredAt}}).First(&existing)
+		if db.NewRecord(existing) {
+			reading.OccurredAt = addEasternTZ(reading.OccurredAt)
+			_ = db.Create(&reading)
+			inserted++
+		}
 	}
-	log.Printf("Inserted %d CGM Readings", len(cgmReadings))
+	db.Commit()
+	log.Printf("Inserted %d CGM Readings", inserted)
+}
+
+var (
+	eastern *time.Location
+)
+
+func addEasternTZ(t time.Time) time.Time {
+	if eastern == nil {
+		var err error
+		eastern, err = time.LoadLocation("America/New_York")
+		if err != nil {
+			log.Printf("Eastern err %v", err)
+			return t
+		}
+	}
+	year, month, day := t.Date()
+	hour, minute, second := t.Clock()
+	return time.Date(year, month, day, hour, minute, second, 0, eastern)
+
 }
